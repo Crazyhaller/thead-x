@@ -66,7 +66,7 @@ export async function fetchUserPosts(userId: string) {
   try {
     connectToDB()
 
-    //Find all threads authored by the user with the given userId
+    // Find all threads authored by the user with the given userId
     const threads = await User.findOne({ id: userId }).populate({
       path: 'threads',
       model: Thread,
@@ -74,7 +74,7 @@ export async function fetchUserPosts(userId: string) {
         {
           path: 'community',
           model: Community,
-          select: 'name id image _id', //Select the "name" and "_id" fields from the "Community" model
+          select: 'name id image _id', // Select the "name" and "_id" fields from the "Community" model
         },
         {
           path: 'children',
@@ -82,7 +82,7 @@ export async function fetchUserPosts(userId: string) {
           populate: {
             path: 'author',
             model: User,
-            select: 'name image id', //Select the "name" and "_id" fields from the "User" model
+            select: 'name image id', // Select the "name" and "_id" fields from the "User" model
           },
         },
       ],
@@ -94,7 +94,7 @@ export async function fetchUserPosts(userId: string) {
   }
 }
 
-//Almost similar to Thead (search + pagination) and Community (search + pagination)
+// Almost similar to Thead (search + pagination) and Community (search + pagination)
 export async function fetchUsers({
   userId,
   searchString = '',
@@ -111,23 +111,23 @@ export async function fetchUsers({
   try {
     connectToDB()
 
-    //Calculate the number of users to skip based on the page number and page size.
+    // Calculate the number of users to skip based on the page number and page size.
     const skipAmount = (pageNumber - 1) * pageSize
 
-    //Create a case-insensitive regular expression for the provided search string.
+    // Create a case-insensitive regular expression for the provided search string.
     const regex = new RegExp(searchString, 'i')
 
-    //Create an initial query object to filter users.
+    // Create an initial query object to filter users.
     const query: FilterQuery<typeof User> = {
       id: { $ne: userId }, // Exclude the current user from the results.
     }
 
-    //If the search string is not empty, add the $or operator to match either username or name fields.
+    // If the search string is not empty, add the $or operator to match either username or name fields.
     if (searchString.trim() !== '') {
       query.$or = [{ username: { $regex: regex } }, { name: { $regex: regex } }]
     }
 
-    //Define the sort options for the fetched users based on createdAt field and provided sort order.
+    // Define the sort options for the fetched users based on createdAt field and provided sort order.
     const sortOptions = { createdAt: sortBy }
 
     const usersQuery = User.find(query)
@@ -135,12 +135,12 @@ export async function fetchUsers({
       .skip(skipAmount)
       .limit(pageSize)
 
-    //Count the total number of users that match the search criteria (without pagination).
+    // Count the total number of users that match the search criteria (without pagination).
     const totalUsersCount = await User.countDocuments(query)
 
     const users = await usersQuery.exec()
 
-    //Check if there are more users beyond the current page.
+    // Check if there are more users beyond the current page.
     const isNext = totalUsersCount > skipAmount + users.length
 
     return { users, isNext }
@@ -154,18 +154,18 @@ export async function getActivity(userId: string) {
   try {
     connectToDB()
 
-    //Find all threads created by the user
+    // Find all threads created by the user
     const userThreads = await Thread.find({ author: userId })
 
-    //Collect all the child thread ids (replies) from the 'children' field of each user thread
+    // Collect all the child thread ids (replies) from the 'children' field of each user thread
     const childThreadIds = userThreads.reduce((acc, userThread) => {
       return acc.concat(userThread.children)
     }, [])
 
-    //Find and return the child threads (replies) excluding the ones created by the same user
+    // Find and return the child threads (replies) excluding the ones created by the same user
     const replies = await Thread.find({
       _id: { $in: childThreadIds },
-      author: { $ne: userId }, //Exclude threads authored by the same user
+      author: { $ne: userId }, // Exclude threads authored by the same user
     }).populate({
       path: 'author',
       model: User,

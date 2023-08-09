@@ -1,18 +1,20 @@
-import { ClerkProvider } from '@clerk/nextjs'
-import '../globals.css'
+import React from 'react'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { ClerkProvider } from '@clerk/nextjs'
+import { dark } from '@clerk/themes'
 
-import Navbar from '@/components/shared/Navbar'
+import '../globals.css'
 import LeftSidebar from '@/components/shared/LeftSidebar'
+import Bottombar from '@/components/shared/Footer'
 import RightSidebar from '@/components/shared/RightSidebar'
-import Footer from '@/components/shared/Footer'
+import Topbar from '@/components/shared/Navbar'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Thread-X',
-  component: 'A Next.js 13 Thread-X Application',
+  description: 'A Next.js 13 Meta x Twitter(X) Threads Application',
 }
 
 export default function RootLayout({
@@ -21,22 +23,27 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-    <html lang="en">
-      <body className={inter.className}>
-        <Navbar />
-        <main className='flex flex-row'>
-          <LeftSidebar />
-          <section className='main-container'>
-            <div className='w-full max-w-4xl'>
-              {children}
-            </div>
-          </section>
-          <RightSidebar />
-        </main>
-        <Footer />
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+      }}
+    >
+      <html lang="en">
+        <body className={inter.className}>
+          <Topbar />
+
+          <main className="flex flex-row">
+            <LeftSidebar />
+            <section className="main-container">
+              <div className="w-full max-w-4xl">{children}</div>
+            </section>
+            {/* @ts-ignore */}
+            <RightSidebar />
+          </main>
+
+          <Bottombar />
         </body>
-    </html>
+      </html>
     </ClerkProvider>
   )
 }
