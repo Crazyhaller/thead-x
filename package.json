@@ -24,7 +24,7 @@
     "clsx": "^2.0.0",
     "form": "^0.2.4",
     "lucide-react": "^0.263.1",
-    "mongoose": "6.11.5",
+    "mongoose": "^7.4.2",
     "next": "13.4.12",
     "postcss": "8.4.27",
     "radix-ui": "^1.0.1",
